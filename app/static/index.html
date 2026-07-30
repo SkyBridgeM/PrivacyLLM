@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>PrivacyLLM</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260730-5">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+    <header class="app-header">
+      <div class="brand-group">
+        <a class="brand" href="/" aria-label="PrivacyLLM 首页">PrivacyLLM</a>
+        <span class="local-status">仅在本机处理</span>
+      </div>
+      <nav class="main-nav" aria-label="主要功能">
+        <button class="nav-item is-active" data-tab="redact" type="button">文本脱敏</button>
+        <button class="nav-item" data-tab="restore" type="button">恢复文本</button>
+        <button class="nav-item" data-tab="dictionary" type="button">业务词典</button>
+        <button class="nav-item" data-tab="settings" type="button">设置</button>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section class="tab-panel is-active" id="panel-redact" data-panel="redact">
+        <div class="workspace">
+          <div class="editor-column">
+            <section class="work-panel input-panel" aria-labelledby="input-heading">
+              <div class="section-heading">
+                <div>
+                  <h1 id="input-heading">原始文本</h1>
+                  <p>粘贴内容后使用本地规则和业务词典进行识别。</p>
+                </div>
+                <div class="mode-actions" aria-label="识别模式">
+                  <label class="mode-option">
+                    <input type="radio" name="mode" value="quick" checked>
+                    <span>快速模式</span>
+                  </label>
+                  <label id="semantic-mode-option" class="mode-option is-disabled" title="正在检测本地模型">
+                    <input type="radio" name="mode" value="semantic" disabled>
+                    <span>语义增强</span>
+                  </label>
+                  <button id="analyze-button" class="button button-primary" type="button">
+                    识别敏感信息
+                  </button>
+                </div>
+              </div>
+
+              <div id="semantic-note" class="semantic-note">正在检测本地语义模型…</div>
+
+              <label class="sr-only" for="source-text">需要脱敏的原始文本</label>
+              <textarea
+                id="source-text"
+                class="text-editor"
+                maxlength="50000"
+                spellcheck="false"
+                placeholder="在这里粘贴需要交给外部 AI 的文本"
+              ></textarea>
+              <div class="editor-footer">
+                <span id="source-count">字数：0</span>
+              </div>
+
+              <div id="highlight-region" class="highlight-region" hidden>
+                <div class="subheading-row">
+                  <h2>识别预览</h2>
+                  <div class="highlight-legend" aria-label="脱敏状态图例">
+                    <span><i class="legend-swatch is-selected"></i>已选脱敏</span>
+                    <span><i class="legend-swatch is-unselected"></i>未选脱敏</span>
+                    <span><i class="legend-swatch is-conflict"></i>冲突</span>
+                  </div>
+                </div>
+                <p class="highlight-help">点击下划线可切换是否参与脱敏。</p>
+                <div id="highlight-preview" class="highlight-preview"></div>
+              </div>
+            </section>
+
+            <section class="work-panel output-panel" aria-labelledby="output-heading">
+              <div class="section-heading compact">
+                <div>
+                  <h2 id="output-heading">脱敏结果</h2>
+                  <p>生成后可选中漏掉的敏感文字，直接补充为自定义脱敏。</p>
+                </div>
+                <div class="button-group">
+                  <button id="copy-button" class="button button-secondary" type="button" disabled>
+                    复制结果
+                  </button>
+                  <button id="download-button" class="button button-secondary" type="button" disabled>
+                    下载映射
+                  </button>
+                </div>
+              </div>
+              <div id="output-empty" class="empty-state">
+                <strong>尚未生成脱敏结果</strong>
+                <span>完成识别和复核后，点击右侧的“生成脱敏文本”。</span>
+              </div>
+              <div class="output-selection-wrap">
+                <div
+                  id="redacted-output"
+                  class="text-editor output-editor selectable-output"
+                  role="textbox"
+                  aria-label="脱敏结果"
+                  aria-readonly="true"
+                  tabindex="0"
+                  hidden
+                ></div>
+                <div id="output-selection-toolbar" class="selection-toolbar" hidden>
+                  <button
+                    id="add-output-selection-button"
+                    class="selection-action"
+                    type="button"
+                    title="将选中的漏识别文字标记为自定义脱敏"
+                  >
+                    <span class="underline-icon" aria-hidden="true">U</span>
+                    标记为自定义脱敏
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="review-panel" aria-labelledby="review-heading">
+            <div class="section-heading compact review-header">
+              <div>
+                <h2 id="review-heading">识别结果</h2>
+                <p id="entity-count">尚未识别</p>
+              </div>
+              <div class="button-group">
+                <button id="select-all-button" class="text-button" type="button">全部选择</button>
+                <button id="clear-entities-button" class="text-button danger-text" type="button">清空</button>
+              </div>
+            </div>
+
+            <div id="review-empty" class="empty-state review-empty">
+              <strong>等待识别</strong>
+              <span>识别出的敏感信息会在这里逐项展示。</span>
+            </div>
+
+            <div id="entity-list-wrap" hidden>
+              <div class="entity-columns" aria-hidden="true">
+                <span>脱敏</span>
+                <span>类型与原文</span>
+                <span>来源</span>
+              </div>
+              <div id="entity-list" class="entity-list"></div>
+            </div>
+
+            <section id="entity-detail" class="entity-detail" hidden aria-labelledby="detail-heading">
+              <h3 id="detail-heading">选中项详情</h3>
+              <div id="conflict-message" class="inline-message warning" hidden>
+                此实体与其他候选重叠，请调整边界或只选择其中一项。
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>类型</span>
+                  <select id="detail-type"></select>
+                </label>
+                <label>
+                  <span>原文</span>
+                  <input id="detail-text" type="text">
+                </label>
+                <label>
+                  <span>起始位置</span>
+                  <input id="detail-start" type="number" min="0">
+                </label>
+                <label>
+                  <span>结束位置</span>
+                  <input id="detail-end" type="number" min="1">
+                </label>
+              </div>
+              <div class="detail-actions">
+                <button id="apply-detail-button" class="button button-secondary" type="button">应用修改</button>
+                <button id="delete-entity-button" class="text-button danger-text" type="button">删除此项</button>
+              </div>
+            </section>
+
+            <div class="review-footer">
+              <div id="redact-error" class="inline-message error" role="alert" hidden></div>
+              <button id="anonymize-button" class="button button-primary full-width" type="button" disabled>
+                生成脱敏文本
+              </button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="tab-panel simple-page" id="panel-restore" data-panel="restore" hidden>
+        <div class="page-heading">
+          <h1>恢复文本</h1>
+          <p>将外部 AI 返回的文本与映射文件在本机组合，精确恢复占位符。</p>
+        </div>
+        <div class="restore-grid">
+          <section class="work-panel">
+            <label for="restore-input">包含占位符的文本</label>
+            <textarea id="restore-input" class="text-editor" maxlength="100000" placeholder="粘贴外部 AI 返回的文本"></textarea>
+            <label for="mapping-file">使用其他映射文件覆盖</label>
+            <input id="mapping-file" class="file-input" type="file" accept=".json,application/json">
+            <p id="mapping-file-name" class="helper-text">当前会话还没有可用映射。你也可以手动选择映射 JSON 文件。</p>
+            <button id="restore-button" class="button button-primary" type="button">恢复文本</button>
+            <div id="restore-error" class="inline-message error" role="alert" hidden></div>
+          </section>
+          <section class="work-panel">
+            <div class="section-heading compact">
+              <div>
+                <h2>恢复结果</h2>
+                <p id="restore-summary">尚未执行恢复。</p>
+              </div>
+              <button id="copy-restore-button" class="button button-secondary" type="button" disabled>复制结果</button>
+            </div>
+            <textarea id="restore-output" class="text-editor" readonly placeholder="恢复结果将显示在这里"></textarea>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel simple-page" id="panel-dictionary" data-panel="dictionary" hidden>
+        <div class="page-heading">
+          <h1>业务词典</h1>
+          <p>维护需要始终识别的项目名、客户名、部门和其他本地关键词。</p>
+        </div>
+        <section class="work-panel dictionary-panel">
+          <div class="section-heading compact">
+            <div>
+              <h2>词典条目</h2>
+              <p>配置保存在本机 JSON 文件中，保存时会保留一份备份。</p>
+            </div>
+            <button id="add-dictionary-button" class="button button-secondary" type="button">新增条目</button>
+          </div>
+          <div id="dictionary-list" class="dictionary-list"></div>
+          <div id="dictionary-empty" class="empty-state">
+            <strong>词典为空</strong>
+            <span>添加项目名称或业务关键词后，快速模式即可识别。</span>
+          </div>
+          <div class="panel-actions">
+            <div id="dictionary-message" class="inline-message" role="status" hidden></div>
+            <button id="save-dictionary-button" class="button button-primary" type="button">保存词典</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="tab-panel simple-page" id="panel-settings" data-panel="settings" hidden>
+        <div class="page-heading">
+          <h1>设置</h1>
+          <p>设置各类实体被识别后是否默认勾选。所有配置仅保存在本机。</p>
+        </div>
+        <section class="work-panel settings-panel">
+          <h2>默认脱敏策略</h2>
+          <div id="settings-list" class="settings-list"></div>
+          <div class="panel-actions">
+            <div id="settings-message" class="inline-message" role="status" hidden></div>
+            <button id="save-settings-button" class="button button-primary" type="button">保存设置</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>正文不会离开此设备</span>
+    </footer>
+
+    <div id="live-region" class="sr-only" aria-live="polite"></div>
+    <script src="/static/app.js?v=20260730-5" defer></script>
+  </body>
+</html>

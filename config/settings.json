@@ -1,0 +1,21 @@
+{
+  "entity_defaults": {
+    "PHONE": true,
+    "ID_CARD": true,
+    "BANK_CARD": true,
+    "EMAIL": true,
+    "CREDIT_CODE": true,
+    "IP_ADDRESS": true,
+    "SECURITY_CODE": false,
+    "AMOUNT": false,
+    "DATE": false,
+    "LOCATION": true,
+    "PERSON": true,
+    "ORGANIZATION": true,
+    "PROJECT": true,
+    "DEPARTMENT": true,
+    "BUSINESS_SECRET": true,
+    "CUSTOM": true
+  }
+}
+

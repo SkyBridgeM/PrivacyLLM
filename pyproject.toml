@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "privacy-llm"
+version = "0.1.0"
+description = "Local reversible text redaction core"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+  "fastapi>=0.116",
+  "pydantic>=2.11",
+  "regex>=2024.11.6",
+  "uvicorn>=0.35",
+]
+
+[project.optional-dependencies]
+dev = ["httpx>=0.28", "pytest>=8.0", "pytest-cov>=5.0"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
