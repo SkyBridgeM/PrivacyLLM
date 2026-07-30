@@ -8,8 +8,6 @@ PrivacyLLM 是一款本地运行的可逆文本脱敏工具。它可以在你把
 
 整个脱敏、映射和恢复流程均在本机完成。
 
-![PrivacyLLM WebUI](design-references/web-mvp-desktop-populated.png)
-
 ## 主要功能
 
 - 识别手机号、邮箱、身份证、银行卡、信用代码、金额、日期和 IP 地址等格式化信息。
