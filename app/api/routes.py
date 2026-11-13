@@ -23,10 +23,10 @@ from app.recognizers.custom_regex_recognizer import (
     CustomRegexTimeout,
     InvalidCustomRule,
 )
-from app.recognizers.ollama_recognizer import (
-    OllamaRecognizer,
-    OllamaUnavailable,
-    model_status as get_ollama_status,
+from app.recognizers.semantic_recognizer import (
+    SemanticRecognizer,
+    SemanticUnavailable,
+    model_status as get_semantic_status,
 )
 from app.schemas.api import (
     AnalyzeTextRequest,
@@ -142,7 +142,7 @@ def health() -> dict[str, str]:
 
 @router.get("/model/status")
 def model_status() -> dict[str, Any]:
-    return get_ollama_status()
+    return get_semantic_status()
 
 
 @router.post("/analyze/text", response_model=AnalyzeTextResponse)
@@ -151,13 +151,13 @@ def analyze_text(request: AnalyzeTextRequest) -> AnalyzeTextResponse:
         rule_entities = _load_pipeline().analyze(request.text)
         entities = rule_entities
         if request.use_llm:
-            semantic_entities = OllamaRecognizer().analyze(request.text)
+            semantic_entities = SemanticRecognizer().analyze(request.text)
             semantic_entities = _filter_semantic_duplicates(
                 semantic_entities, rule_entities
             )
             entities = merge_entities([rule_entities, semantic_entities])
         defaults = settings_store.load()
-    except OllamaUnavailable as exc:
+    except SemanticUnavailable as exc:
         raise HTTPException(
             status_code=503,
             detail=f"语义增强不可用：{exc}",

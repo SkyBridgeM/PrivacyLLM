@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -7,12 +9,24 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import router
+from app.recognizers.llama_runtime import runtime
 
 
 APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        await asyncio.to_thread(runtime.start)
+        yield
+    finally:
+        await asyncio.to_thread(runtime.stop)
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="PrivacyLLM",
     description="Local-only reversible text redaction",
     docs_url=None,

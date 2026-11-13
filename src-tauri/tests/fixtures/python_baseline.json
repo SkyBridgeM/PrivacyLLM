@@ -1,0 +1,594 @@
+{
+  "dictionary": [
+    {
+      "value": "渝西专项",
+      "entity_type": "PROJECT",
+      "enabled": true,
+      "selected": true
+    },
+    {
+      "value": "重庆某城投集团",
+      "entity_type": "ORGANIZATION",
+      "enabled": true,
+      "selected": true
+    },
+    {
+      "value": "张伟",
+      "entity_type": "PERSON",
+      "enabled": true,
+      "selected": true
+    }
+  ],
+  "rules": [
+    {
+      "name": "project_number",
+      "pattern": "YX-\\d{4}-\\d{3}",
+      "entity_type": "PROJECT",
+      "enabled": true,
+      "selected": true,
+      "test_samples": []
+    },
+    {
+      "name": "conflict",
+      "pattern": "专项",
+      "entity_type": "CUSTOM",
+      "enabled": true,
+      "selected": true,
+      "test_samples": []
+    }
+  ],
+  "cases": [
+    {
+      "text": "电话13812345678，邮箱alice@example.com，身份证11010519491231002X，IP为192.168.1.1。",
+      "entities": [
+        {
+          "text": "13812345678",
+          "entity_type": "PHONE",
+          "start": 2,
+          "end": 13,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "alice@example.com",
+          "entity_type": "EMAIL",
+          "start": 16,
+          "end": 33,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "11010519491231002X",
+          "entity_type": "ID_CARD",
+          "start": 37,
+          "end": 55,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "192.168.1.1",
+          "entity_type": "IP_ADDRESS",
+          "start": 59,
+          "end": 70,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "电话[PHONE_001]，邮箱[EMAIL_001]，身份证[ID_001]，IP为[IP_001]。",
+      "mappings": [
+        {
+          "placeholder": "[PHONE_001]",
+          "original": "13812345678",
+          "entity_type": "PHONE"
+        },
+        {
+          "placeholder": "[EMAIL_001]",
+          "original": "alice@example.com",
+          "entity_type": "EMAIL"
+        },
+        {
+          "placeholder": "[ID_001]",
+          "original": "11010519491231002X",
+          "entity_type": "ID_CARD"
+        },
+        {
+          "placeholder": "[IP_001]",
+          "original": "192.168.1.1",
+          "entity_type": "IP_ADDRESS"
+        }
+      ]
+    },
+    {
+      "text": "身份证11010519491331002X，IP 999.1.1.1，日期2026-02-30。",
+      "entities": [],
+      "redacted": "身份证11010519491331002X，IP 999.1.1.1，日期2026-02-30。",
+      "mappings": []
+    },
+    {
+      "text": "金额人民币 12.50万元，日期2026年7月30日。",
+      "entities": [
+        {
+          "text": "人民币 12.50万元",
+          "entity_type": "AMOUNT",
+          "start": 2,
+          "end": 13,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        },
+        {
+          "text": "2026年7月30日",
+          "entity_type": "DATE",
+          "start": 16,
+          "end": 26,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        }
+      ],
+      "redacted": "金额人民币 12.50万元，日期2026年7月30日。",
+      "mappings": []
+    },
+    {
+      "text": "卡号4111111111111111，无效卡4111111111111112。",
+      "entities": [
+        {
+          "text": "4111111111111111",
+          "entity_type": "BANK_CARD",
+          "start": 2,
+          "end": 18,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "卡号[BANK_001]，无效卡4111111111111112。",
+      "mappings": [
+        {
+          "placeholder": "[BANK_001]",
+          "original": "4111111111111111",
+          "entity_type": "BANK_CARD"
+        }
+      ]
+    },
+    {
+      "text": "😀𠮷联系13812345678，邮箱a+b@example.co.uk。",
+      "entities": [
+        {
+          "text": "13812345678",
+          "entity_type": "PHONE",
+          "start": 4,
+          "end": 15,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "a+b@example.co.uk",
+          "entity_type": "EMAIL",
+          "start": 18,
+          "end": 35,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "😀𠮷联系[PHONE_001]，邮箱[EMAIL_001]。",
+      "mappings": [
+        {
+          "placeholder": "[PHONE_001]",
+          "original": "13812345678",
+          "entity_type": "PHONE"
+        },
+        {
+          "placeholder": "[EMAIL_001]",
+          "original": "a+b@example.co.uk",
+          "entity_type": "EMAIL"
+        }
+      ]
+    },
+    {
+      "text": "保留[PHONE_001]，电话13812345678，再联系13812345678。",
+      "entities": [
+        {
+          "text": "13812345678",
+          "entity_type": "PHONE",
+          "start": 16,
+          "end": 27,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "13812345678",
+          "entity_type": "PHONE",
+          "start": 31,
+          "end": 42,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "保留[PHONE_001]，电话[PHONE_002]，再联系[PHONE_002]。",
+      "mappings": [
+        {
+          "placeholder": "[PHONE_002]",
+          "original": "13812345678",
+          "entity_type": "PHONE"
+        }
+      ]
+    },
+    {
+      "text": "联系138123456780，113812345678，邮箱 x@example.com.cn",
+      "entities": [
+        {
+          "text": "138123456780",
+          "entity_type": "BANK_CARD",
+          "start": 2,
+          "end": 14,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "x@example.com.cn",
+          "entity_type": "EMAIL",
+          "start": 31,
+          "end": 47,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "联系[BANK_001]，113812345678，邮箱 [EMAIL_001]",
+      "mappings": [
+        {
+          "placeholder": "[BANK_001]",
+          "original": "138123456780",
+          "entity_type": "BANK_CARD"
+        },
+        {
+          "placeholder": "[EMAIL_001]",
+          "original": "x@example.com.cn",
+          "entity_type": "EMAIL"
+        }
+      ]
+    },
+    {
+      "text": "日期2000-02-29，日期1900-02-29，日期2026/11/13，股票600000。",
+      "entities": [
+        {
+          "text": "2000-02-29",
+          "entity_type": "DATE",
+          "start": 2,
+          "end": 12,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        },
+        {
+          "text": "2026/11/13",
+          "entity_type": "DATE",
+          "start": 28,
+          "end": 38,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        },
+        {
+          "text": "600000",
+          "entity_type": "SECURITY_CODE",
+          "start": 41,
+          "end": 47,
+          "confidence": 0.9,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        }
+      ],
+      "redacted": "日期2000-02-29，日期1900-02-29，日期2026/11/13，股票600000。",
+      "mappings": []
+    },
+    {
+      "text": "金额￥100.00，人民币100万元。IP 127.0.0.1，256.1.1.1。",
+      "entities": [
+        {
+          "text": "￥100.00",
+          "entity_type": "AMOUNT",
+          "start": 2,
+          "end": 9,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        },
+        {
+          "text": "人民币100万元",
+          "entity_type": "AMOUNT",
+          "start": 10,
+          "end": 18,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": false,
+          "conflict": false
+        },
+        {
+          "text": "127.0.0.1",
+          "entity_type": "IP_ADDRESS",
+          "start": 22,
+          "end": 31,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "金额￥100.00，人民币100万元。IP [IP_001]，256.1.1.1。",
+      "mappings": [
+        {
+          "placeholder": "[IP_001]",
+          "original": "127.0.0.1",
+          "entity_type": "IP_ADDRESS"
+        }
+      ]
+    },
+    {
+      "text": "张伟负责渝西专项，张伟也联系重庆某城投集团。",
+      "entities": [
+        {
+          "text": "张伟",
+          "entity_type": "PERSON",
+          "start": 0,
+          "end": 2,
+          "confidence": 1.0,
+          "source": "dictionary",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "渝西专项",
+          "entity_type": "PROJECT",
+          "start": 4,
+          "end": 8,
+          "confidence": 1.0,
+          "source": "dictionary",
+          "selected": false,
+          "conflict": true
+        },
+        {
+          "text": "专项",
+          "entity_type": "CUSTOM",
+          "start": 6,
+          "end": 8,
+          "confidence": 1.0,
+          "source": "custom_regex:conflict",
+          "selected": false,
+          "conflict": true
+        },
+        {
+          "text": "张伟",
+          "entity_type": "PERSON",
+          "start": 9,
+          "end": 11,
+          "confidence": 1.0,
+          "source": "dictionary",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "重庆某城投集团",
+          "entity_type": "ORGANIZATION",
+          "start": 14,
+          "end": 21,
+          "confidence": 1.0,
+          "source": "dictionary",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "[PERSON_001]负责渝西专项，[PERSON_001]也联系[ORG_001]。",
+      "mappings": [
+        {
+          "placeholder": "[PERSON_001]",
+          "original": "张伟",
+          "entity_type": "PERSON"
+        },
+        {
+          "placeholder": "[ORG_001]",
+          "original": "重庆某城投集团",
+          "entity_type": "ORGANIZATION"
+        }
+      ]
+    },
+    {
+      "text": "YX-2026-001 已立项，YX-2026-002 暂缓。",
+      "entities": [
+        {
+          "text": "YX-2026-001",
+          "entity_type": "PROJECT",
+          "start": 0,
+          "end": 11,
+          "confidence": 1.0,
+          "source": "custom_regex:project_number",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "YX-2026-002",
+          "entity_type": "PROJECT",
+          "start": 16,
+          "end": 27,
+          "confidence": 1.0,
+          "source": "custom_regex:project_number",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "[PROJECT_001] 已立项，[PROJECT_002] 暂缓。",
+      "mappings": [
+        {
+          "placeholder": "[PROJECT_001]",
+          "original": "YX-2026-001",
+          "entity_type": "PROJECT"
+        },
+        {
+          "placeholder": "[PROJECT_002]",
+          "original": "YX-2026-002",
+          "entity_type": "PROJECT"
+        }
+      ]
+    },
+    {
+      "text": "专项专项，渝西专项联系人13812345678。",
+      "entities": [
+        {
+          "text": "专项",
+          "entity_type": "CUSTOM",
+          "start": 0,
+          "end": 2,
+          "confidence": 1.0,
+          "source": "custom_regex:conflict",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "专项",
+          "entity_type": "CUSTOM",
+          "start": 2,
+          "end": 4,
+          "confidence": 1.0,
+          "source": "custom_regex:conflict",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "渝西专项",
+          "entity_type": "PROJECT",
+          "start": 5,
+          "end": 9,
+          "confidence": 1.0,
+          "source": "dictionary",
+          "selected": false,
+          "conflict": true
+        },
+        {
+          "text": "专项",
+          "entity_type": "CUSTOM",
+          "start": 7,
+          "end": 9,
+          "confidence": 1.0,
+          "source": "custom_regex:conflict",
+          "selected": false,
+          "conflict": true
+        },
+        {
+          "text": "13812345678",
+          "entity_type": "PHONE",
+          "start": 12,
+          "end": 23,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "[CUSTOM_001][CUSTOM_001]，渝西专项联系人[PHONE_001]。",
+      "mappings": [
+        {
+          "placeholder": "[CUSTOM_001]",
+          "original": "专项",
+          "entity_type": "CUSTOM"
+        },
+        {
+          "placeholder": "[PHONE_001]",
+          "original": "13812345678",
+          "entity_type": "PHONE"
+        }
+      ]
+    },
+    {
+      "text": "",
+      "entities": [],
+      "redacted": "",
+      "mappings": []
+    },
+    {
+      "text": "没有敏感信息的普通文本。",
+      "entities": [],
+      "redacted": "没有敏感信息的普通文本。",
+      "mappings": []
+    },
+    {
+      "text": "邮箱 alice@example.com，IP 192.168.1.1。\n第二行电话13912345678。",
+      "entities": [
+        {
+          "text": "alice@example.com",
+          "entity_type": "EMAIL",
+          "start": 3,
+          "end": 20,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "192.168.1.1",
+          "entity_type": "IP_ADDRESS",
+          "start": 24,
+          "end": 35,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        },
+        {
+          "text": "13912345678",
+          "entity_type": "PHONE",
+          "start": 42,
+          "end": 53,
+          "confidence": 1.0,
+          "source": "regex",
+          "selected": true,
+          "conflict": false
+        }
+      ],
+      "redacted": "邮箱 [EMAIL_001]，IP [IP_001]。\n第二行电话[PHONE_001]。",
+      "mappings": [
+        {
+          "placeholder": "[EMAIL_001]",
+          "original": "alice@example.com",
+          "entity_type": "EMAIL"
+        },
+        {
+          "placeholder": "[IP_001]",
+          "original": "192.168.1.1",
+          "entity_type": "IP_ADDRESS"
+        },
+        {
+          "placeholder": "[PHONE_001]",
+          "original": "13912345678",
+          "entity_type": "PHONE"
+        }
+      ]
+    }
+  ]
+}

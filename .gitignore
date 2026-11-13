@@ -14,3 +14,12 @@ build/
 *.log
 config/*.bak
 privacy-mapping-*.json
+
+# Local inference binaries, models and setup downloads
+.runtime/
+
+# Rust desktop and frontend build output
+node_modules/
+src-tauri/target/
+src-tauri/resources/llama.cpp/
+src-tauri/gen/schemas/

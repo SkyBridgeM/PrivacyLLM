@@ -94,12 +94,12 @@ def test_semantic_mode_merges_local_model_results(
                 start=3,
                 end=5,
                 confidence=0.93,
-                source="qwen",
+                source="semantic",
             )
         ]
 
     monkeypatch.setattr(
-        routes.OllamaRecognizer, "analyze", fake_semantic_analyze
+        routes.SemanticRecognizer, "analyze", fake_semantic_analyze
     )
     response = client.post(
         "/api/v1/analyze/text",
@@ -108,7 +108,7 @@ def test_semantic_mode_merges_local_model_results(
     assert response.status_code == 200
     assert response.json()["semantic_available"] is True
     assert response.json()["entities"][0]["text"] == "张敏"
-    assert response.json()["entities"][0]["source"] == "qwen"
+    assert response.json()["entities"][0]["source"] == "semantic"
 
 
 def test_semantic_mode_discards_guesses_over_structured_rule_matches(
@@ -127,7 +127,7 @@ def test_semantic_mode_discards_guesses_over_structured_rule_matches(
                 start=3,
                 end=14,
                 confidence=0.8,
-                source="qwen",
+                source="semantic",
             ),
             Entity(
                 text="liwenbo@example.com",
@@ -135,12 +135,12 @@ def test_semantic_mode_discards_guesses_over_structured_rule_matches(
                 start=17,
                 end=36,
                 confidence=0.8,
-                source="qwen",
+                source="semantic",
             ),
         ]
 
     monkeypatch.setattr(
-        routes.OllamaRecognizer, "analyze", fake_semantic_analyze
+        routes.SemanticRecognizer, "analyze", fake_semantic_analyze
     )
     response = client.post(
         "/api/v1/analyze/text",
@@ -192,3 +192,21 @@ def test_invalid_mapping_returns_safe_error(client: TestClient) -> None:
     )
     assert response.status_code == 422
     assert response.json()["detail"] == "映射文件格式无效或版本不受支持"
+
+
+def test_semantic_failure_does_not_break_quick_mode(client, monkeypatch):
+    def unavailable(self, text):
+        raise routes.SemanticUnavailable("本地推理进程已退出，请重启应用")
+
+    monkeypatch.setattr(routes.SemanticRecognizer, "analyze", unavailable)
+    source = "联系人13812345678"
+    semantic = client.post(
+        "/api/v1/analyze/text", json={"text": source, "use_llm": True}
+    )
+    assert semantic.status_code == 503
+    assert "本地推理进程已退出" in semantic.json()["detail"]
+    quick = client.post(
+        "/api/v1/analyze/text", json={"text": source, "use_llm": False}
+    )
+    assert quick.status_code == 200
+    assert quick.json()["entities"][0]["text"] == "13812345678"

@@ -721,7 +721,7 @@ function sourceLabel(source) {
   if (source.includes("dictionary")) return "业务词典";
   if (source.includes("custom_regex")) return "自定义规则";
   if (source.includes("manual")) return "手动添加";
-  if (source.includes("qwen")) return "语义模型";
+  if (source.includes("semantic") || source.includes("qwen")) return "语义模型";
   return "规则匹配";
 }
 
@@ -736,7 +736,7 @@ async function loadModelStatus() {
     option.classList.toggle("is-disabled", !status.available);
     option.title = status.message;
     note.textContent = status.available
-      ? `语义增强已连接 ${status.model}，文本仅发送到本机 Ollama。`
+      ? `语义增强已连接 ${status.model}，文本仅在本机处理。`
       : `${status.message}。快速模式仍可正常使用。`;
     note.classList.toggle("is-ready", status.available);
   } catch (error) {
